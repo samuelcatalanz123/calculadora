@@ -37,8 +37,10 @@ class _CalculadoraState extends State<Calculadora> {
   void _presionar(String t) {
     if (t == 'C') {
       _limpiar();
-    } else if (t == '⌫') {
-      _borrar();
+    } else if (t == '±') {
+      _signo();
+    } else if (t == '%') {
+      _porciento();
     } else if (['+', '-', '×', '÷'].contains(t)) {
       _operadorPresionado(t);
     } else if (t == '=') {
@@ -117,13 +119,19 @@ class _CalculadoraState extends State<Calculadora> {
     });
   }
 
-  void _borrar() {
+  // Cambia el signo del número (positivo ↔ negativo).
+  void _signo() {
     setState(() {
-      if (_display.length <= 1) {
-        _display = '0';
-      } else {
-        _display = _display.substring(0, _display.length - 1);
-      }
+      final n = double.tryParse(_display) ?? 0;
+      _display = _formatear(-n);
+    });
+  }
+
+  // Convierte el número a porcentaje (lo divide entre 100).
+  void _porciento() {
+    setState(() {
+      final n = double.tryParse(_display) ?? 0;
+      _display = _formatear(n / 100);
     });
   }
 
@@ -144,10 +152,10 @@ class _CalculadoraState extends State<Calculadora> {
   @override
   Widget build(BuildContext context) {
     final filas = [
-      ['C', '⌫', '÷', '×'],
-      ['7', '8', '9', '-'],
-      ['4', '5', '6', '+'],
-      ['1', '2', '3', '.'],
+      ['C', '±', '%', '÷'],
+      ['7', '8', '9', '×'],
+      ['4', '5', '6', '-'],
+      ['1', '2', '3', '+'],
     ];
 
     return Scaffold(
@@ -200,6 +208,7 @@ class _CalculadoraState extends State<Calculadora> {
                     Row(children: fila.map((t) => _boton(t)).toList()),
                   Row(children: [
                     _boton('0', flex: 2),
+                    _boton('.'),
                     _boton('=', color: Colors.indigo),
                   ]),
                 ],
@@ -215,7 +224,7 @@ class _CalculadoraState extends State<Calculadora> {
   Widget _boton(String texto, {Color? color, int flex = 1}) {
     final esOperador = ['+', '-', '×', '÷', '='].contains(texto);
     final fondo = color ??
-        (texto == 'C' || texto == '⌫'
+        (['C', '±', '%'].contains(texto)
             ? Colors.indigo.shade400
             : esOperador
                 ? Colors.indigo.shade600
