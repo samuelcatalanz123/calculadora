@@ -31,6 +31,7 @@ class _CalculadoraState extends State<Calculadora> {
   double? _acumulado; // el primer número guardado
   String? _operador; // la operación pendiente (+, -, ×, ÷)
   bool _reiniciarAlEscribir = false;
+  final List<String> _historial = []; // operaciones anteriores
 
   // Cuando se presiona un botón, decidimos qué hacer según su texto.
   void _presionar(String t) {
@@ -93,7 +94,14 @@ class _CalculadoraState extends State<Calculadora> {
 
   void _igual() {
     setState(() {
-      _calcular();
+      if (_operador != null && _acumulado != null) {
+        // Guardamos la operación completa en el historial.
+        final a = _formatear(_acumulado!);
+        final segundo = _display;
+        _calcular();
+        _historial.insert(0, '$a $_operador $segundo = $_display');
+        if (_historial.length > 6) _historial.removeLast();
+      }
       _operador = null;
       _acumulado = null;
       _reiniciarAlEscribir = true;
@@ -170,6 +178,19 @@ class _CalculadoraState extends State<Calculadora> {
                 ),
               ),
             ),
+            // Historial de operaciones anteriores
+            if (_historial.isNotEmpty)
+              SizedBox(
+                height: 64,
+                child: ListView(
+                  padding: const EdgeInsets.symmetric(horizontal: 28),
+                  children: _historial
+                      .map((h) => Text(h,
+                          textAlign: TextAlign.right,
+                          style: const TextStyle(color: Colors.white38, fontSize: 16)))
+                      .toList(),
+                ),
+              ),
             // Botones
             Padding(
               padding: const EdgeInsets.all(8),
