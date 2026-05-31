@@ -125,6 +125,14 @@ class _CalculadoraState extends State<Calculadora> {
     return n.toString();
   }
 
+  // La operación pendiente, para mostrarla arriba (ej. "7 ×").
+  String get _expresion {
+    if (_operador != null && _acumulado != null) {
+      return '${_formatear(_acumulado!)} $_operador';
+    }
+    return '';
+  }
+
   @override
   Widget build(BuildContext context) {
     final filas = [
@@ -144,10 +152,21 @@ class _CalculadoraState extends State<Calculadora> {
               child: Container(
                 alignment: Alignment.bottomRight,
                 padding: const EdgeInsets.all(28),
-                child: Text(
-                  _display,
-                  style: const TextStyle(color: Colors.white, fontSize: 64, fontWeight: FontWeight.w300),
-                  maxLines: 1,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(
+                      _expresion,
+                      style: const TextStyle(color: Colors.white54, fontSize: 26),
+                      maxLines: 1,
+                    ),
+                    Text(
+                      _display,
+                      style: const TextStyle(color: Colors.white, fontSize: 64, fontWeight: FontWeight.w300),
+                      maxLines: 1,
+                    ),
+                  ],
                 ),
               ),
             ),
